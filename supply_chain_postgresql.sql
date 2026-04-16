@@ -1,18 +1,3 @@
--- ============================================================
--- Cosmetics Supply Chain Analytics — Phase 3: SQL Analysis
--- Database: PostgreSQL
--- Tool: pgAdmin Query Tool
--- For Cencora BI Analyst Portfolio Project
--- ============================================================
-
-
--- ============================================================
--- ANGLE 1: STOCKOUT RISK ANALYSIS
--- Business Question: Which high-revenue SKUs are at risk
--- of running out of stock?
--- ============================================================
-
--- 1A. All at-risk SKUs ranked by revenue (most critical first)
 SELECT
     sku,
     product_type,
@@ -31,8 +16,6 @@ FROM supply_chain
 WHERE stock_levels < 20
 ORDER BY revenue_generated DESC;
 
-
--- 1B. Stockout risk summary by product type
 SELECT
     product_type,
     COUNT(*)                                                    AS total_skus,
@@ -45,8 +28,6 @@ FROM supply_chain
 GROUP BY product_type
 ORDER BY risk_percentage DESC;
 
-
--- 1C. Revenue at risk (revenue coming from low-stock SKUs)
 SELECT
     product_type,
     ROUND(SUM(CASE WHEN stock_levels < 20
@@ -59,14 +40,6 @@ FROM supply_chain
 GROUP BY product_type
 ORDER BY revenue_at_risk DESC;
 
-
--- ============================================================
--- ANGLE 2: SUPPLIER PERFORMANCE ANALYSIS
--- Business Question: Which suppliers are most reliable,
--- cost-efficient, and have lowest defect rates?
--- ============================================================
-
--- 2A. Supplier scorecard (most important query — use in Power BI)
 SELECT
     supplier_name,
     COUNT(*)                                                AS total_skus,
@@ -84,9 +57,6 @@ FROM supply_chain
 GROUP BY supplier_name
 ORDER BY avg_defect_rate ASC;
 
-
--- 2B. Supplier on-time delivery rate
--- (lead time <= 15 days considered on time)
 SELECT
     supplier_name,
     COUNT(*)                                                    AS total_orders,
@@ -98,8 +68,6 @@ FROM supply_chain
 GROUP BY supplier_name
 ORDER BY on_time_rate_pct DESC;
 
-
--- 2C. Best supplier per product type
 SELECT
     product_type,
     supplier_name,
@@ -111,14 +79,6 @@ FROM supply_chain
 GROUP BY product_type, supplier_name
 ORDER BY product_type, avg_defect_rate ASC;
 
-
--- ============================================================
--- ANGLE 3: SHIPPING & CARRIER EFFICIENCY ANALYSIS
--- Business Question: Which carrier and route gives the
--- best balance of speed and cost?
--- ============================================================
-
--- 3A. Carrier performance comparison
 SELECT
     shipping_carriers,
     COUNT(*)                                        AS total_shipments,
@@ -132,8 +92,6 @@ FROM supply_chain
 GROUP BY shipping_carriers
 ORDER BY avg_shipping_cost ASC;
 
-
--- 3B. Transportation mode efficiency
 SELECT
     transportation_modes,
     COUNT(*)                                        AS usage_count,
@@ -145,8 +103,6 @@ FROM supply_chain
 GROUP BY transportation_modes
 ORDER BY avg_cost ASC;
 
-
--- 3C. Route performance
 SELECT
     routes,
     COUNT(*)                                        AS shipment_count,
@@ -158,8 +114,6 @@ FROM supply_chain
 GROUP BY routes
 ORDER BY avg_cost ASC;
 
-
--- 3D. Best carrier + route combination
 SELECT
     shipping_carriers,
     routes,
@@ -170,14 +124,6 @@ FROM supply_chain
 GROUP BY shipping_carriers, routes
 ORDER BY avg_cost ASC;
 
-
--- ============================================================
--- ANGLE 4: DEFECT RATE & QUALITY ANALYSIS
--- Business Question: Which products, suppliers, and locations
--- have the worst quality issues?
--- ============================================================
-
--- 4A. Defect rate by product type
 SELECT
     product_type,
     ROUND(AVG(defect_rates)::NUMERIC, 3)        AS avg_defect_rate,
@@ -190,8 +136,6 @@ FROM supply_chain
 GROUP BY product_type
 ORDER BY avg_defect_rate DESC;
 
-
--- 4B. Inspection results breakdown
 SELECT
     inspection_results,
     COUNT(*)                                        AS count,
@@ -203,8 +147,6 @@ FROM supply_chain
 GROUP BY inspection_results
 ORDER BY count DESC;
 
-
--- 4C. Top 10 worst quality SKUs
 SELECT
     sku,
     product_type,
@@ -218,8 +160,6 @@ FROM supply_chain
 ORDER BY defect_rates DESC
 LIMIT 10;
 
-
--- 4D. Defect rate by location
 SELECT
     location,
     COUNT(*)                                        AS sku_count,
@@ -229,13 +169,6 @@ SELECT
 FROM supply_chain
 GROUP BY location
 ORDER BY avg_defect_rate DESC;
-
-
--- ============================================================
--- BONUS: EXECUTIVE SUMMARY QUERY
--- Single query for overall business health
--- Perfect for Power BI KPI cards
--- ============================================================
 
 SELECT
     COUNT(*)                                                    AS total_skus,
